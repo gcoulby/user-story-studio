@@ -1,7 +1,7 @@
 import type { Epic } from '@/types/domain'
 
-import { loadStudioData } from './load-studio-data'
+import { loadExampleData } from './load-studio-data'
 
 export function loadEpics(): Epic[] {
-  return loadStudioData().epics
+  return loadExampleData().epics
 }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { strToU8 } from 'fflate'
 
-import { emptyStudioData } from '@/data/load-studio-data'
+import { emptyStudioData, loadExampleData } from '@/data/load-studio-data'
 import {
   downloadBytes,
   forgetHandle,
@@ -48,6 +48,7 @@ export interface ProjectPersistenceApi {
   error: string | null
   clearError: () => void
   newProject: () => Promise<void>
+  openExample: () => Promise<void>
   openProject: () => Promise<void>
   saveProject: () => Promise<void>
   saveProjectAs: () => Promise<void>
@@ -190,10 +191,35 @@ export function useProjectPersistence(data: DataPort): ProjectPersistenceApi {
     [bindHandle, persistToIdb, replaceAll],
   )
 
+  const isEmpty =
+    data.actors.length === 0 &&
+    data.epics.length === 0 &&
+    data.cards.length === 0
+
   const newProject = useCallback(async () => {
-    if (!window.confirm('Discard the current map and start a new one?')) return
+    if (
+      !isEmpty &&
+      !window.confirm('Discard the current map and start a new one?')
+    ) {
+      return
+    }
     await applyLoaded(newManifest(), emptyStudioData(), null, null)
-  }, [applyLoaded])
+  }, [applyLoaded, isEmpty])
+
+  const openExample = useCallback(async () => {
+    if (
+      !isEmpty &&
+      !window.confirm('Replace the current map with the example?')
+    ) {
+      return
+    }
+    await applyLoaded(
+      newManifest('Taskboard (example)'),
+      loadExampleData(),
+      null,
+      null,
+    )
+  }, [applyLoaded, isEmpty])
 
   const openProject = useCallback(async () => {
     setError(null)
@@ -292,6 +318,7 @@ export function useProjectPersistence(data: DataPort): ProjectPersistenceApi {
     error,
     clearError: () => setError(null),
     newProject,
+    openExample,
     openProject,
     saveProject,
     saveProjectAs,

@@ -15,7 +15,7 @@ export function CardNode({ data, selected }: NodeProps<CardNodeType>) {
   return (
     <div
       className={cn(
-        'rounded-lg border bg-card px-3.5 py-3 text-left shadow-sm transition-opacity',
+        'elevation-1 rounded-lg border bg-card px-3.5 py-3 text-left transition-opacity',
         selected ? 'border-foreground ring-1 ring-foreground' : 'border-border',
       )}
       style={{ width: CARD_W, minHeight: CARD_H, opacity: dimmed ? 0.25 : 1 }}

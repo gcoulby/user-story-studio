@@ -114,6 +114,7 @@ function GraphCanvas({ data, selection, colorMode }: GraphViewProps) {
       nodesConnectable={false}
       edgesFocusable={false}
       colorMode={colorMode}
+      style={{ background: 'hsl(var(--surface))' }}
       proOptions={{ hideAttribution: true }}
       fitView
       fitViewOptions={{ padding: 0.2, maxZoom: 1 }}

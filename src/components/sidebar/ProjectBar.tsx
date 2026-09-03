@@ -1,4 +1,10 @@
-import { FileDown, FilePlus2, FolderOpen, Save } from 'lucide-react'
+import {
+  FileDown,
+  FilePlus2,
+  FolderOpen,
+  Save,
+  Sparkles,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import type { ProjectPersistenceApi } from '@/hooks/useProjectPersistence'
@@ -11,7 +17,7 @@ interface ProjectBarProps {
 // these bind it to a portable .uss file and produce a Markdown copy.
 export function ProjectBar({ project }: ProjectBarProps) {
   return (
-    <div className="mt-6 space-y-1.5">
+    <div className="mt-1 space-y-1.5">
       <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
         Project
       </div>
@@ -59,6 +65,15 @@ export function ProjectBar({ project }: ProjectBarProps) {
           Markdown
         </Button>
       </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-7 w-full text-xs text-muted-foreground"
+        onClick={() => void project.openExample()}
+      >
+        <Sparkles size={13} />
+        Open example map
+      </Button>
       {project.isBound && (
         <Button
           variant="ghost"

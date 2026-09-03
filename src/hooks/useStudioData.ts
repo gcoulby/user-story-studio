@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 
-import { loadStudioData } from '@/data/load-studio-data'
+import { emptyStudioData } from '@/data/load-studio-data'
 import { newId } from '@/lib/id'
 import { nextEpicColor } from '@/config/palette'
 import type {
@@ -37,7 +37,7 @@ export interface StudioDataApi {
 }
 
 export function useStudioData(): StudioDataApi {
-  const [initial] = useState(loadStudioData)
+  const [initial] = useState(emptyStudioData)
   const [actors, setActors] = useState<Actor[]>(initial.actors)
   const [epics, setEpics] = useState<Epic[]>(initial.epics)
   const [cards, setCards] = useState<Card[]>(initial.cards)

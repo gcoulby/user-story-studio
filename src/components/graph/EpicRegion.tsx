@@ -17,8 +17,8 @@ export function EpicRegion({ epic, width, height }: EpicRegionProps) {
       style={{
         width,
         height,
-        background: hexWithAlpha(epic.color, 0x12),
-        borderColor: hexWithAlpha(epic.color, 0x59),
+        background: hexWithAlpha(epic.color, 0x16),
+        borderColor: hexWithAlpha(epic.color, 0x66),
       }}
     >
       <span

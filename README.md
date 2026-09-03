@@ -13,6 +13,12 @@ wiki page conflates:
 Vite + React + TypeScript, Tailwind + shadcn/ui, `@xyflow/react` for the graph,
 `fflate` for the project archive. Uses `pnpm`.
 
+The left rail and the right detail panel are shadcn `Sidebar`s
+(`src/components/ui/sidebar.tsx`, adapted to a flex layout for two independent
+sidebars). Each collapses to a rail — via its header button, the header toggle,
+or a keyboard shortcut (⌘/Ctrl+B for the left, ⌘/Ctrl+E for the right) — and its
+open state is remembered in a cookie.
+
 ## Develop
 
 ```bash
@@ -22,6 +28,11 @@ pnpm dev
 
 `pnpm build` type-checks and produces a production bundle. `pnpm lint` runs
 oxlint.
+
+## Starting point
+
+New maps open blank. **Open example map** (sidebar or the empty-state screen)
+loads a bundled software-app example — a team task board — from `src/data/`.
 
 ## Persistence
 

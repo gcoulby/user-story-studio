@@ -22,9 +22,9 @@ export function StoryCard({
     <div
       onClick={() => onSelect(card.id)}
       className={cn(
-        'cursor-pointer rounded-lg border p-4 transition-colors',
+        'elevation-1 cursor-pointer rounded-lg border bg-card p-4 transition-colors',
         selected
-          ? 'border-primary'
+          ? 'border-foreground'
           : 'border-border hover:border-muted-foreground/40',
       )}
     >

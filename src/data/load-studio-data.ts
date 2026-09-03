@@ -5,17 +5,17 @@ import { seedCards } from './seed-cards'
 import { seedEpics } from './seed-epics'
 import { seedRelationships } from './seed-relationships'
 
-// The bundled seed set. Used as the initial state before the IndexedDB working
-// copy is hydrated, and as the starting point for a brand-new project.
-export function loadStudioData(): StudioData {
+// A brand-new map. This is the default state on first run.
+export function emptyStudioData(): StudioData {
+  return { actors: [], epics: [], cards: [], relationships: [] }
+}
+
+// The bundled example ("Taskboard"), loaded on demand via "Open example".
+export function loadExampleData(): StudioData {
   return {
     actors: seedActors,
     epics: seedEpics,
     cards: seedCards,
     relationships: seedRelationships,
   }
-}
-
-export function emptyStudioData(): StudioData {
-  return { actors: [], epics: [], cards: [], relationships: [] }
 }

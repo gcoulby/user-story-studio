@@ -35,11 +35,11 @@ export function TableView({
           No cards match this filter.
         </div>
       ) : (
-        <table className="w-full border-collapse">
+        <table className="elevation-1 w-full border-collapse overflow-hidden rounded-lg border bg-card">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-wide text-muted-foreground">
+            <tr className="border-b border-border bg-muted/50 text-left text-[11px] uppercase tracking-wide text-muted-foreground">
               {HEADINGS.map((heading) => (
-                <th key={heading} className="px-2.5 py-1.5 font-medium">
+                <th key={heading} className="px-2.5 py-2 font-medium">
                   {heading}
                 </th>
               ))}
