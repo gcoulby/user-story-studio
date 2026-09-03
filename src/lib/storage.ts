@@ -1,9 +1,8 @@
-import type { StudioData } from '@/types/domain'
+// UI preferences live in localStorage under their own key. Losing them is a
+// non-event and they can never corrupt the domain data, which is persisted
+// separately in IndexedDB (see useProjectPersistence).
 
-export const STORAGE_KEYS = {
-  domain: 'use-case-studio:domain',
-  preferences: 'use-case-studio:preferences',
-} as const
+export const PREFERENCES_KEY = 'user-story-studio:preferences'
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
@@ -14,47 +13,20 @@ export interface StudioPreferences {
   showEpicRegions: boolean
 }
 
-function readJson<T>(key: string): T | null {
+export function readPreferences(): Partial<StudioPreferences> | null {
   try {
-    const raw = window.localStorage.getItem(key)
-    if (!raw) return null
-    return JSON.parse(raw) as T
+    const raw = window.localStorage.getItem(PREFERENCES_KEY)
+    return raw ? (JSON.parse(raw) as Partial<StudioPreferences>) : null
   } catch {
     return null
   }
 }
 
-function writeJson(key: string, value: unknown): boolean {
+export function writePreferences(prefs: StudioPreferences): boolean {
   try {
-    window.localStorage.setItem(key, JSON.stringify(value))
+    window.localStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs))
     return true
   } catch {
     return false
   }
-}
-
-export function readDomainData(): StudioData | null {
-  const data = readJson<Partial<StudioData>>(STORAGE_KEYS.domain)
-  if (
-    !data ||
-    !Array.isArray(data.actors) ||
-    !Array.isArray(data.epics) ||
-    !Array.isArray(data.cards) ||
-    !Array.isArray(data.relationships)
-  ) {
-    return null
-  }
-  return data as StudioData
-}
-
-export function writeDomainData(data: StudioData): boolean {
-  return writeJson(STORAGE_KEYS.domain, data)
-}
-
-export function readPreferences(): Partial<StudioPreferences> | null {
-  return readJson<Partial<StudioPreferences>>(STORAGE_KEYS.preferences)
-}
-
-export function writePreferences(prefs: StudioPreferences): boolean {
-  return writeJson(STORAGE_KEYS.preferences, prefs)
 }

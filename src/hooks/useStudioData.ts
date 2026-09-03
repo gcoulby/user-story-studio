@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { loadStudioData } from '@/data/load-studio-data'
 import { newId } from '@/lib/id'
 import { nextEpicColor } from '@/config/palette'
-import { writeDomainData, type SaveStatus } from '@/lib/storage'
 import type {
   Actor,
   Card,
@@ -12,8 +11,6 @@ import type {
   RelationshipType,
   StudioData,
 } from '@/types/domain'
-
-const SAVE_DEBOUNCE_MS = 600
 
 export interface NewRelationshipInput {
   sourceId: string
@@ -27,7 +24,6 @@ export interface StudioDataApi {
   epics: Epic[]
   cards: Card[]
   relationships: Relationship[]
-  saveStatus: SaveStatus
   addActor: (name: string) => void
   addEpic: (name: string) => void
   upsertCard: (card: Card) => void
@@ -37,7 +33,7 @@ export interface StudioDataApi {
   addRelationship: (input: NewRelationshipInput) => void
   removeRelationship: (id: string) => void
   replaceAll: (data: StudioData) => void
-  exportData: () => StudioData
+  snapshot: () => StudioData
 }
 
 export function useStudioData(): StudioDataApi {
@@ -48,21 +44,6 @@ export function useStudioData(): StudioDataApi {
   const [relationships, setRelationships] = useState<Relationship[]>(
     initial.relationships,
   )
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
-
-  const firstRun = useRef(true)
-  useEffect(() => {
-    if (firstRun.current) {
-      firstRun.current = false
-      return
-    }
-    setSaveStatus('saving')
-    const handle = window.setTimeout(() => {
-      const ok = writeDomainData({ actors, epics, cards, relationships })
-      setSaveStatus(ok ? 'saved' : 'error')
-    }, SAVE_DEBOUNCE_MS)
-    return () => window.clearTimeout(handle)
-  }, [actors, epics, cards, relationships])
 
   const addActor = useCallback(
     (name: string) => {
@@ -136,7 +117,7 @@ export function useStudioData(): StudioDataApi {
     setRelationships(data.relationships)
   }, [])
 
-  const exportData = useCallback(
+  const snapshot = useCallback(
     (): StudioData => ({ actors, epics, cards, relationships }),
     [actors, epics, cards, relationships],
   )
@@ -146,7 +127,6 @@ export function useStudioData(): StudioDataApi {
     epics,
     cards,
     relationships,
-    saveStatus,
     addActor,
     addEpic,
     upsertCard,
@@ -156,6 +136,6 @@ export function useStudioData(): StudioDataApi {
     addRelationship,
     removeRelationship,
     replaceAll,
-    exportData,
+    snapshot,
   }
 }

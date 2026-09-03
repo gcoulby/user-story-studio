@@ -17,9 +17,9 @@ export function OwnershipLine({
     <BaseEdge
       path={floating.path}
       style={{
-        stroke: '#d4d4d4',
+        stroke: 'hsl(var(--graph-ownership))',
         strokeWidth: 1.3,
-        opacity: data?.dimmed ? 0.1 : 0.7,
+        opacity: data?.dimmed ? 0.15 : 0.9,
       }}
     />
   )

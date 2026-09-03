@@ -9,7 +9,7 @@ import type { ActorNodeType } from './types'
 export function ActorNode({ data }: NodeProps<ActorNodeType>) {
   return (
     <div
-      className="flex items-center justify-center rounded-full bg-neutral-900 px-3 text-center text-[12.5px] font-medium text-neutral-50"
+      className="flex items-center justify-center rounded-full bg-foreground px-3 text-center text-[12.5px] font-medium text-background"
       style={{ width: ACTOR_W, height: ACTOR_H }}
     >
       {data.name}

@@ -7,6 +7,7 @@ import {
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
+  type ColorMode,
   type Edge,
   type EdgeTypes,
   type NodeChange,
@@ -41,9 +42,10 @@ const edgeTypes: EdgeTypes = {
 interface GraphViewProps {
   data: StudioDataApi
   selection: StudioSelectionApi
+  colorMode: ColorMode
 }
 
-function GraphCanvas({ data, selection }: GraphViewProps) {
+function GraphCanvas({ data, selection, colorMode }: GraphViewProps) {
   const { actors, cards, epics, relationships } = data
   const { activeEpicFilter, selectedCardId, showEpicRegions } = selection
 
@@ -111,12 +113,18 @@ function GraphCanvas({ data, selection }: GraphViewProps) {
       onPaneClick={() => selection.selectCard(null)}
       nodesConnectable={false}
       edgesFocusable={false}
+      colorMode={colorMode}
       proOptions={{ hideAttribution: true }}
       fitView
       fitViewOptions={{ padding: 0.2, maxZoom: 1 }}
       minZoom={0.2}
     >
-      <Background variant={BackgroundVariant.Dots} gap={22} size={1.4} />
+      <Background
+        variant={BackgroundVariant.Dots}
+        gap={22}
+        size={1.4}
+        color="hsl(var(--graph-dots))"
+      />
       <Controls showInteractive={false} />
       {showEpicRegions && <EpicRegionsLayer cards={cards} epics={epics} />}
     </ReactFlow>

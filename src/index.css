@@ -24,9 +24,15 @@
     --input: 0 0% 89.8%;
     --ring: 0 0% 63%;
     --radius: 0.5rem;
+    --graph-dots: 0 0% 84%;
+    --graph-ownership: 0 0% 72%;
+    color-scheme: light;
   }
 
   .dark {
+    color-scheme: dark;
+    --graph-dots: 0 0% 28%;
+    --graph-ownership: 0 0% 40%;
     --background: 0 0% 9%;
     --foreground: 0 0% 98%;
     --card: 0 0% 11%;

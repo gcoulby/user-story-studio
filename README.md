@@ -1,4 +1,4 @@
-# Use Case Studio
+# User Story Studio
 
 A capture tool for use-case-driven requirements. It separates three things a
 wiki page conflates:
@@ -10,20 +10,27 @@ wiki page conflates:
 
 ## Stack
 
-Vite + React + TypeScript, Tailwind + shadcn/ui, `@xyflow/react` for the graph.
+Vite + React + TypeScript, Tailwind + shadcn/ui, `@xyflow/react` for the graph,
+`fflate` for the project archive. Uses `pnpm`.
 
 ## Develop
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
-`npm run build` type-checks and produces a production bundle. `npm run lint`
-runs oxlint.
+`pnpm build` type-checks and produces a production bundle. `pnpm lint` runs
+oxlint.
 
 ## Persistence
 
-Domain data (actors, epics, cards, relationships) and UI preferences are stored
-under separate `localStorage` keys. Use **Export** / **Import** in the sidebar to
-move a workspace as a JSON file.
+The current map autosaves to the browser (IndexedDB) as you work. **Save / Save
+as** binds it to a portable **`.uss`** file — a zip archive containing the
+manifest, one JSON file per entity, and a generated `stories.md`. Where the
+browser supports the File System Access API, subsequent edits write straight
+back to that file; otherwise Save downloads a fresh copy. **Open** loads a
+`.uss` file, and **Markdown** exports a standalone human-readable `.md`.
+
+UI preferences (active view, epic filter, theme) are kept separately in
+`localStorage`.

@@ -1,22 +1,24 @@
 import { Layers, Users } from 'lucide-react'
 
 import { Checkbox } from '@/components/ui/checkbox'
+import type { ProjectPersistenceApi } from '@/hooks/useProjectPersistence'
 import type { StudioDataApi } from '@/hooks/useStudioData'
 import type { StudioSelectionApi } from '@/hooks/useStudioSelection'
 
 import { ActorList } from './ActorList'
 import { AddInlineForm } from './AddInlineForm'
-import { DataTransfer } from './DataTransfer'
 import { EpicList } from './EpicList'
 import { NewCardButton } from './NewCardButton'
+import { ProjectBar } from './ProjectBar'
 import { SectionLabel } from './SectionLabel'
 
 interface SidebarProps {
   data: StudioDataApi
   selection: StudioSelectionApi
+  project: ProjectPersistenceApi
 }
 
-export function Sidebar({ data, selection }: SidebarProps) {
+export function Sidebar({ data, selection, project }: SidebarProps) {
   return (
     <aside className="w-60 shrink-0 overflow-y-auto border-r border-border bg-card p-4 text-sm">
       <NewCardButton onClick={selection.openNewCard} />
@@ -52,7 +54,7 @@ export function Sidebar({ data, selection }: SidebarProps) {
         </label>
       )}
 
-      <DataTransfer exportData={data.exportData} onImport={data.replaceAll} />
+      <ProjectBar project={project} />
     </aside>
   )
 }
