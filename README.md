@@ -41,7 +41,10 @@ as** binds it to a portable **`.uss`** file — a zip archive containing the
 manifest, one JSON file per entity, and a generated `stories.md`. Where the
 browser supports the File System Access API, subsequent edits write straight
 back to that file; otherwise Save downloads a fresh copy. **Open** loads a
-`.uss` file, and **Markdown** exports a standalone human-readable `.md`.
+`.uss` file, and **Markdown** exports a standalone human-readable `.md` that
+opens with a Mermaid `flowchart` of the map (actors, epic subgraphs, ownership
+lines, typed relationship edges), so the use-case diagram travels with the
+prose. That same `.md` is regenerated into every `.uss` as `stories.md`.
 
 UI preferences (active view, epic filter, theme) are kept separately in
 `localStorage`.

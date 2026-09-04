@@ -1,5 +1,6 @@
 import { RELATIONSHIP_TYPES } from '@/config/relationship-types'
 import { groupCardsByActor, storySentence } from '@/lib/cards'
+import { studioToMermaid } from '@/lib/mermaid'
 import type { StudioData } from '@/types/domain'
 
 // Human-readable rendering of a user story map: stories grouped by actor, each
@@ -19,6 +20,11 @@ export function studioToMarkdown(data: StudioData, title: string): string {
       `${epics.length} ${plural(epics.length, 'epic')}._`,
     '',
   )
+
+  const diagram = studioToMermaid(data)
+  if (diagram) {
+    lines.push('## Diagram', '', '```mermaid', diagram, '```', '')
+  }
 
   for (const group of groupCardsByActor(cards, actors)) {
     lines.push(`## ${group.actor.name}`, '')
