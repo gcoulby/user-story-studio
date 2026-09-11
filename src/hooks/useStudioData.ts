@@ -26,6 +26,8 @@ export interface StudioDataApi {
   relationships: Relationship[]
   addActor: (name: string) => void
   addEpic: (name: string) => void
+  deleteActor: (id: string) => void
+  deleteEpic: (id: string) => void
   upsertCard: (card: Card) => void
   deleteCard: (id: string) => void
   moveCard: (id: string, x: number, y: number) => void
@@ -64,6 +66,24 @@ export function useStudioData(): StudioDataApi {
       ...prev,
       { id: newId('e'), name: trimmed, color: nextEpicColor(prev.length) },
     ])
+  }, [])
+
+  const deleteActor = useCallback((id: string) => {
+    setActors((prev) => prev.filter((a) => a.id !== id))
+    setCards((prev) =>
+      prev.map((c) => (c.actorId === id ? { ...c, actorId: '' } : c)),
+    )
+  }, [])
+
+  const deleteEpic = useCallback((id: string) => {
+    setEpics((prev) => prev.filter((e) => e.id !== id))
+    setCards((prev) =>
+      prev.map((c) =>
+        c.epicIds.includes(id)
+          ? { ...c, epicIds: c.epicIds.filter((e) => e !== id) }
+          : c,
+      ),
+    )
   }, [])
 
   const upsertCard = useCallback((card: Card) => {
@@ -129,6 +149,8 @@ export function useStudioData(): StudioDataApi {
     relationships,
     addActor,
     addEpic,
+    deleteActor,
+    deleteEpic,
     upsertCard,
     deleteCard,
     moveCard,
