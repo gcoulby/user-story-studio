@@ -80,10 +80,6 @@ export function CardDetail({
           {actorLabel.toLowerCase()}
         </div>
         <div>
-          <span className="text-muted-foreground">when </span>
-          {card.trigger || '—'}
-        </div>
-        <div>
           <span className="text-muted-foreground">I want to </span>
           {card.goal || '—'}
         </div>
@@ -104,6 +100,10 @@ export function CardDetail({
       </FieldBlock>
 
       <FieldBlock label="Confirmation">
+        <div className="mb-1.5">
+          <span className="text-muted-foreground">when </span>
+          {card.trigger || '—'}
+        </div>
         {card.confirmation.length > 0 ? (
           <ul className="list-disc space-y-1 pl-4">
             {card.confirmation.map((criterion) => (

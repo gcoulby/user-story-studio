@@ -30,3 +30,21 @@ export function writePreferences(prefs: StudioPreferences): boolean {
     return false
   }
 }
+
+const LAST_ACTOR_KEY = 'user-story-studio:last-actor-id'
+
+export function readLastActorId(): string | null {
+  try {
+    return window.localStorage.getItem(LAST_ACTOR_KEY)
+  } catch {
+    return null
+  }
+}
+
+export function writeLastActorId(actorId: string): void {
+  try {
+    window.localStorage.setItem(LAST_ACTOR_KEY, actorId)
+  } catch {
+    // ignore
+  }
+}

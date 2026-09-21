@@ -15,6 +15,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { createEmptyCard } from '@/lib/create-card'
 import { newId } from '@/lib/id'
+import { readLastActorId, writeLastActorId } from '@/lib/storage'
 import type { Actor, Card, Epic } from '@/types/domain'
 
 interface CardEditorProps {
@@ -34,15 +35,20 @@ export function CardEditor({
   onCancel,
   onDelete,
 }: CardEditorProps) {
-  const [draft, setDraft] = useState<Card>(() =>
-    card
-      ? {
-          ...card,
-          confirmation: card.confirmation.map((c) => ({ ...c })),
-          epicIds: [...card.epicIds],
-        }
-      : createEmptyCard(actors[0]?.id ?? ''),
-  )
+  const [draft, setDraft] = useState<Card>(() => {
+    if (card) {
+      return {
+        ...card,
+        confirmation: card.confirmation.map((c) => ({ ...c })),
+        epicIds: [...card.epicIds],
+      }
+    }
+    const lastActorId = readLastActorId()
+    const defaultActorId = actors.some((a) => a.id === lastActorId)
+      ? (lastActorId as string)
+      : actors[0]?.id ?? ''
+    return createEmptyCard(defaultActorId)
+  })
   const [newCriterion, setNewCriterion] = useState('')
 
   const set = <K extends keyof Card>(key: K) => (value: Card[K]) =>
@@ -112,14 +118,6 @@ export function CardEditor({
         </SelectContent>
       </Select>
 
-      <Label>When (trigger)</Label>
-      <Input
-        value={draft.trigger}
-        onChange={(e) => set('trigger')(e.target.value)}
-        placeholder="An insured loss occurs"
-        className="mb-3 mt-1"
-      />
-
       <Label emphasis>I want to</Label>
       <Textarea
         value={draft.goal}
@@ -144,6 +142,14 @@ export function CardEditor({
         rows={3}
         placeholder="What was actually discussed, and with whom"
         className="mb-3 mt-1 resize-y"
+      />
+
+      <Label>When (trigger)</Label>
+      <Input
+        value={draft.trigger}
+        onChange={(e) => set('trigger')(e.target.value)}
+        placeholder="An insured loss occurs"
+        className="mb-3 mt-1"
       />
 
       <Label>Confirmation (acceptance criteria)</Label>
@@ -193,7 +199,10 @@ export function CardEditor({
         <Button
           className="flex-1"
           disabled={!canSave}
-          onClick={() => onSave({ ...draft, goal: draft.goal.trim() })}
+          onClick={() => {
+            writeLastActorId(draft.actorId)
+            onSave({ ...draft, goal: draft.goal.trim() })
+          }}
         >
           Save
         </Button>

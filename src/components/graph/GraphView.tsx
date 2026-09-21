@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Background,
   BackgroundVariant,
@@ -14,6 +14,7 @@ import {
   type NodeMouseHandler,
   type NodeTypes,
   type OnNodeDrag,
+  type OnSelectionChangeFunc,
 } from '@xyflow/react'
 
 import '@xyflow/react/dist/style.css'
@@ -49,13 +50,20 @@ function GraphCanvas({ data, selection, colorMode }: GraphViewProps) {
   const { actors, cards, epics, relationships } = data
   const { activeEpicFilter, selectedCardId, showEpicRegions } = selection
 
+  // Multi-select (box-select / cmd|ctrl-click) is tracked separately from the
+  // single `selectedCardId` that drives the detail panel, so a group of nodes
+  // can be selected and dragged together without disturbing the detail view.
+  const [multiSelectedIds, setMultiSelectedIds] = useState<Set<string>>(
+    () => new Set(),
+  )
+
   const derivedNodes = useMemo<StudioNode[]>(
     () =>
       buildGraphNodes({ actors, cards, epics, activeEpicFilter }).map((node) => ({
         ...node,
-        selected: node.id === selectedCardId,
+        selected: node.id === selectedCardId || multiSelectedIds.has(node.id),
       })),
-    [actors, cards, epics, activeEpicFilter, selectedCardId],
+    [actors, cards, epics, activeEpicFilter, selectedCardId, multiSelectedIds],
   )
 
   const derivedEdges = useMemo<Edge[]>(
@@ -84,11 +92,16 @@ function GraphCanvas({ data, selection, colorMode }: GraphViewProps) {
   )
 
   const commitPosition = useCallback<OnNodeDrag<StudioNode>>(
-    (_event, node) => {
-      if (node.type === 'card') {
-        data.moveCard(node.id, node.position.x, node.position.y)
-      } else if (node.type === 'actor') {
-        data.moveActor(node.id, node.position.x, node.position.y)
+    (_event, node, draggedNodes) => {
+      // draggedNodes covers every node moved together (the full multi-select),
+      // falling back to the single dragged node when nothing else is selected.
+      const moved = draggedNodes.length > 0 ? draggedNodes : [node]
+      for (const moving of moved) {
+        if (moving.type === 'card') {
+          data.moveCard(moving.id, moving.position.x, moving.position.y)
+        } else if (moving.type === 'actor') {
+          data.moveActor(moving.id, moving.position.x, moving.position.y)
+        }
       }
     },
     [data],
@@ -101,6 +114,13 @@ function GraphCanvas({ data, selection, colorMode }: GraphViewProps) {
     [selection],
   )
 
+  const onSelectionChange = useCallback<OnSelectionChangeFunc>(
+    ({ nodes: selectedNodes }) => {
+      setMultiSelectedIds(new Set(selectedNodes.map((n) => n.id)))
+    },
+    [],
+  )
+
   return (
     <ReactFlow
       nodes={nodes}
@@ -110,7 +130,12 @@ function GraphCanvas({ data, selection, colorMode }: GraphViewProps) {
       onNodesChange={onNodesChange}
       onNodeDragStop={commitPosition}
       onNodeClick={onNodeClick}
-      onPaneClick={() => selection.selectCard(null)}
+      onSelectionChange={onSelectionChange}
+      onPaneClick={() => {
+        selection.selectCard(null)
+        setMultiSelectedIds(new Set())
+      }}
+      multiSelectionKeyCode={['Meta', 'Control']}
       nodesConnectable={false}
       edgesFocusable={false}
       colorMode={colorMode}
