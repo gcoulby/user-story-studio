@@ -58,12 +58,8 @@ function GraphCanvas({ data, selection, colorMode }: GraphViewProps) {
   )
 
   const derivedNodes = useMemo<StudioNode[]>(
-    () =>
-      buildGraphNodes({ actors, cards, epics, activeEpicFilter }).map((node) => ({
-        ...node,
-        selected: node.id === selectedCardId || multiSelectedIds.has(node.id),
-      })),
-    [actors, cards, epics, activeEpicFilter, selectedCardId, multiSelectedIds],
+    () => buildGraphNodes({ actors, cards, epics, activeEpicFilter }),
+    [actors, cards, epics, activeEpicFilter],
   )
 
   const derivedEdges = useMemo<Edge[]>(
@@ -75,6 +71,9 @@ function GraphCanvas({ data, selection, colorMode }: GraphViewProps) {
     useNodesState<StudioNode>(derivedNodes)
   const [edges, setEdges] = useEdgesState<Edge>(derivedEdges)
 
+  // Structural sync only — selection is applied separately below so that
+  // selecting a card doesn't rebuild every node and re-trigger react-flow's
+  // own selection-change sync, which caused an update-depth loop.
   useEffect(() => {
     setNodes(derivedNodes)
   }, [derivedNodes, setNodes])
@@ -82,6 +81,21 @@ function GraphCanvas({ data, selection, colorMode }: GraphViewProps) {
   useEffect(() => {
     setEdges(derivedEdges)
   }, [derivedEdges, setEdges])
+
+  // Applies the `selected` flag without touching nodes whose selection state
+  // didn't change, so this settles in one pass instead of looping with
+  // react-flow's internal selection sync.
+  useEffect(() => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        const isSelected =
+          node.id === selectedCardId || multiSelectedIds.has(node.id)
+        return node.selected === isSelected
+          ? node
+          : { ...node, selected: isSelected }
+      }),
+    )
+  }, [selectedCardId, multiSelectedIds, setNodes])
 
   // Let react-flow own drag/dimension changes; selection is driven by our hook.
   const onNodesChange = useCallback(
@@ -116,7 +130,12 @@ function GraphCanvas({ data, selection, colorMode }: GraphViewProps) {
 
   const onSelectionChange = useCallback<OnSelectionChangeFunc>(
     ({ nodes: selectedNodes }) => {
-      setMultiSelectedIds(new Set(selectedNodes.map((n) => n.id)))
+      setMultiSelectedIds((prev) => {
+        const nextIds = selectedNodes.map((n) => n.id)
+        const isSame =
+          nextIds.length === prev.size && nextIds.every((id) => prev.has(id))
+        return isSame ? prev : new Set(nextIds)
+      })
     },
     [],
   )
