@@ -24,6 +24,8 @@ export interface StudioSelectionApi {
   setView: (view: StudioView) => void
   selectedCardId: string | null
   selectCard: (id: string | null) => void
+  lastTouchedCardId: string | null
+  touchCard: (id: string) => void
   editor: EditorState
   openNewCard: () => void
   openEditCard: (id: string) => void
@@ -44,6 +46,11 @@ export function useStudioSelection(): StudioSelectionApi {
     stored?.view ?? DEFAULTS.view,
   )
   const [selectedCardId, setSelectedCardId] = useState<string | null>(
+    stored?.selectedCardId ?? DEFAULTS.selectedCardId,
+  )
+  // The last card clicked, dragged, or edited — kept even after the selection
+  // is cleared (pane click), so a new card can be placed near it.
+  const [lastTouchedCardId, setLastTouchedCardId] = useState<string | null>(
     stored?.selectedCardId ?? DEFAULTS.selectedCardId,
   )
   const [editor, setEditor] = useState<EditorState>({ mode: 'closed' })
@@ -67,7 +74,12 @@ export function useStudioSelection(): StudioSelectionApi {
 
   const selectCard = useCallback((id: string | null) => {
     setSelectedCardId(id)
+    if (id) setLastTouchedCardId(id)
     setEditor({ mode: 'closed' })
+  }, [])
+
+  const touchCard = useCallback((id: string) => {
+    setLastTouchedCardId(id)
   }, [])
 
   const openNewCard = useCallback(() => {
@@ -77,6 +89,7 @@ export function useStudioSelection(): StudioSelectionApi {
 
   const openEditCard = useCallback((id: string) => {
     setSelectedCardId(id)
+    setLastTouchedCardId(id)
     setEditor({ mode: 'edit', cardId: id })
   }, [])
 
@@ -98,6 +111,8 @@ export function useStudioSelection(): StudioSelectionApi {
     setView,
     selectedCardId,
     selectCard,
+    lastTouchedCardId,
+    touchCard,
     editor,
     openNewCard,
     openEditCard,

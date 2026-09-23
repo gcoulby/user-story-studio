@@ -7,3 +7,4 @@ export const ACTOR_W = 132
 export const ACTOR_H = 44
 export const EPIC_REGION_PAD = 32
 export const EPIC_REGION_LABEL_OFFSET = 20
+export const NEW_CARD_OFFSET = 40

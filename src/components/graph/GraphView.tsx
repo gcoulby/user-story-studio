@@ -113,12 +113,13 @@ function GraphCanvas({ data, selection, colorMode }: GraphViewProps) {
       for (const moving of moved) {
         if (moving.type === 'card') {
           data.moveCard(moving.id, moving.position.x, moving.position.y)
+          selection.touchCard(moving.id)
         } else if (moving.type === 'actor') {
           data.moveActor(moving.id, moving.position.x, moving.position.y)
         }
       }
     },
-    [data],
+    [data, selection],
   )
 
   const onNodeClick = useCallback<NodeMouseHandler<StudioNode>>(

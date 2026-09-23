@@ -33,9 +33,12 @@ export function DetailPanel({ data, selection }: DetailPanelProps) {
 
   let body
   if (editor.mode === 'new' || editor.mode === 'edit') {
+    const anchorCard =
+      data.cards.find((c) => c.id === selection.lastTouchedCardId) ?? null
     body = (
       <CardEditor
         card={editingCard}
+        anchor={anchorCard ? { x: anchorCard.x, y: anchorCard.y } : null}
         actors={data.actors}
         epics={data.epics}
         onSave={(card) => {

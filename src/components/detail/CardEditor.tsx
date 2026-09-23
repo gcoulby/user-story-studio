@@ -20,6 +20,7 @@ import type { Actor, Card, Epic } from '@/types/domain'
 
 interface CardEditorProps {
   card: Card | null
+  anchor?: { x: number; y: number } | null
   actors: Actor[]
   epics: Epic[]
   onSave: (card: Card) => void
@@ -29,6 +30,7 @@ interface CardEditorProps {
 
 export function CardEditor({
   card,
+  anchor,
   actors,
   epics,
   onSave,
@@ -47,7 +49,7 @@ export function CardEditor({
     const defaultActorId = actors.some((a) => a.id === lastActorId)
       ? (lastActorId as string)
       : actors[0]?.id ?? ''
-    return createEmptyCard(defaultActorId)
+    return createEmptyCard(defaultActorId, anchor)
   })
   const [newCriterion, setNewCriterion] = useState('')
 
