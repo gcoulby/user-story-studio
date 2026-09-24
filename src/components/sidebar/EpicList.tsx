@@ -4,11 +4,15 @@ import type { MouseEvent } from 'react'
 import { cn } from '@/lib/utils'
 import type { Card, Epic } from '@/types/domain'
 
+import { InlineName } from './InlineName'
+
 interface EpicListProps {
   epics: Epic[]
   cards: Card[]
   activeEpicFilter: string | null
   onToggleFilter: (epicId: string) => void
+  onRename: (id: string, name: string) => void
+  onRecolor: (id: string, color: string) => void
   onDelete: (id: string) => void
 }
 
@@ -19,6 +23,8 @@ export function EpicList({
   cards,
   activeEpicFilter,
   onToggleFilter,
+  onRename,
+  onRecolor,
   onDelete,
 }: EpicListProps) {
   if (epics.length === 0) {
@@ -51,11 +57,18 @@ export function EpicList({
               activeEpicFilter === epic.id ? 'bg-muted' : 'hover:bg-muted/60',
             )}
           >
-            <span
-              className="h-2 w-2 shrink-0 rounded-sm"
-              style={{ background: epic.color }}
+            <input
+              type="color"
+              value={epic.color}
+              onChange={(e) => onRecolor(epic.id, e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              aria-label={`Colour for ${epic.name}`}
+              className="h-3 w-3 shrink-0 cursor-pointer appearance-none rounded-sm border-0 bg-transparent p-0 [&::-moz-color-swatch]:rounded-sm [&::-moz-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-sm [&::-webkit-color-swatch]:border-0"
             />
-            <span className="flex-1 text-muted-foreground">{epic.name}</span>
+            <InlineName
+              value={epic.name}
+              onCommit={(name) => onRename(epic.id, name)}
+            />
             <span className="text-xs text-muted-foreground">{count}</span>
             <button
               onClick={(e) => handleDelete(epic, e)}

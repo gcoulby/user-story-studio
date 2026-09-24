@@ -2,12 +2,15 @@ import { Trash2 } from 'lucide-react'
 
 import type { Actor } from '@/types/domain'
 
+import { InlineName } from './InlineName'
+
 interface ActorListProps {
   actors: Actor[]
+  onRename: (id: string, name: string) => void
   onDelete: (id: string) => void
 }
 
-export function ActorList({ actors, onDelete }: ActorListProps) {
+export function ActorList({ actors, onRename, onDelete }: ActorListProps) {
   if (actors.length === 0) {
     return <div className="py-1 text-xs italic text-muted-foreground">None yet</div>
   }
@@ -29,7 +32,10 @@ export function ActorList({ actors, onDelete }: ActorListProps) {
           key={actor.id}
           className="group flex items-center gap-2 rounded-md px-1.5 py-1 hover:bg-muted/60"
         >
-          <span className="flex-1 text-muted-foreground">{actor.name}</span>
+          <InlineName
+            value={actor.name}
+            onCommit={(name) => onRename(actor.id, name)}
+          />
           <button
             onClick={() => handleDelete(actor)}
             className="shrink-0 text-muted-foreground/50 opacity-0 hover:text-destructive group-hover:opacity-100"

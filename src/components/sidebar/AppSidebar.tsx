@@ -44,7 +44,11 @@ export function AppSidebar({ data, selection, project }: AppSidebarProps) {
             <Users size={12} />
             Actors
           </SidebarGroupLabel>
-          <ActorList actors={data.actors} onDelete={data.deleteActor} />
+          <ActorList
+            actors={data.actors}
+            onRename={data.renameActor}
+            onDelete={data.deleteActor}
+          />
           <AddInlineForm placeholder="Add actor…" onAdd={data.addActor} />
         </SidebarGroup>
 
@@ -60,6 +64,8 @@ export function AppSidebar({ data, selection, project }: AppSidebarProps) {
             cards={data.cards}
             activeEpicFilter={selection.activeEpicFilter}
             onToggleFilter={selection.toggleEpicFilter}
+            onRename={data.renameEpic}
+            onRecolor={data.recolorEpic}
             onDelete={data.deleteEpic}
           />
           <AddInlineForm placeholder="Add epic…" onAdd={data.addEpic} />
