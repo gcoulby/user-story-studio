@@ -26,6 +26,31 @@ export function studioToMarkdown(data: StudioData, title: string): string {
     lines.push('## Diagram', '', '```mermaid', diagram, '```', '')
   }
 
+  if (epics.length > 0) {
+    lines.push('## Epics', '')
+    for (const epic of epics) {
+      lines.push(`### ${epic.name}`, '')
+      const fields: [string, string | undefined][] = [
+        ['Benefit hypothesis', epic.benefitHypothesis],
+        ['Business need', epic.businessNeed],
+        ['Deliverables', epic.deliverables],
+        ['Dependencies', epic.dependencies],
+      ]
+      for (const [label, value] of fields) {
+        if (value?.trim()) lines.push(`**${label}**`, '', value.trim(), '')
+      }
+      const members = cards.filter((c) => c.epicIds.includes(epic.id))
+      if (members.length > 0) {
+        lines.push('**Requirements**', '')
+        for (const card of members) {
+          const actor = actors.find((a) => a.id === card.actorId)?.name
+          lines.push(`- ${actor ? `${actor}: ` : ''}${card.goal || 'Untitled story'}`)
+        }
+        lines.push('')
+      }
+    }
+  }
+
   for (const group of groupCardsByActor(cards, actors)) {
     lines.push(`## ${group.actor.name}`, '')
     for (const card of group.cards) {

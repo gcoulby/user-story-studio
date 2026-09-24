@@ -14,7 +14,19 @@ export interface Epic {
   id: EpicId
   name: string
   color: string // hex, used directly as an inline style value
+  // Free-text planning fields. Requirements are not stored: they are the
+  // stories (cards) that belong to the epic.
+  benefitHypothesis?: string
+  businessNeed?: string
+  deliverables?: string
+  dependencies?: string
 }
+
+export type EpicTextField =
+  | 'benefitHypothesis'
+  | 'businessNeed'
+  | 'deliverables'
+  | 'dependencies'
 
 export interface AcceptanceCriterion {
   id: string

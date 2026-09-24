@@ -1,5 +1,6 @@
 import { GraphView } from '@/components/graph/GraphView'
 import { DetailPanel } from '@/components/detail/DetailPanel'
+import { EpicsView } from '@/components/epics/EpicsView'
 import { EmptyState } from '@/components/EmptyState'
 import { SaveStatus } from '@/components/SaveStatus'
 import { AppSidebar } from '@/components/sidebar/AppSidebar'
@@ -62,7 +63,7 @@ export default function App() {
             ) : (
               <div className="flex min-h-0 flex-1">
                 <main className="relative min-w-0 flex-1 bg-surface">
-                  {!hasCards && (
+                  {!hasCards && selection.view !== 'epics' && (
                     <EmptyState
                       onNewCard={selection.openNewCard}
                       onOpenExample={() => void project.openExample()}
@@ -94,6 +95,19 @@ export default function App() {
                       activeEpicFilter={selection.activeEpicFilter}
                       selectedCardId={selection.selectedCardId}
                       onSelect={selection.selectCard}
+                    />
+                  )}
+                  {selection.view === 'epics' && (
+                    <EpicsView
+                      epics={data.epics}
+                      cards={data.cards}
+                      actors={data.actors}
+                      activeEpicFilter={selection.activeEpicFilter}
+                      selectedCardId={selection.selectedCardId}
+                      onSelectCard={selection.selectCard}
+                      onRename={data.renameEpic}
+                      onRecolor={data.recolorEpic}
+                      onTextChange={data.setEpicText}
                     />
                   )}
                 </main>

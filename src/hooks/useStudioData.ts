@@ -7,6 +7,7 @@ import type {
   Actor,
   Card,
   Epic,
+  EpicTextField,
   Relationship,
   RelationshipType,
   StudioData,
@@ -29,6 +30,7 @@ export interface StudioDataApi {
   renameActor: (id: string, name: string) => void
   renameEpic: (id: string, name: string) => void
   recolorEpic: (id: string, color: string) => void
+  setEpicText: (id: string, field: EpicTextField, value: string) => void
   deleteActor: (id: string) => void
   deleteEpic: (id: string) => void
   upsertCard: (card: Card) => void
@@ -86,6 +88,15 @@ export function useStudioData(): StudioDataApi {
   const recolorEpic = useCallback((id: string, color: string) => {
     setEpics((prev) => prev.map((e) => (e.id === id ? { ...e, color } : e)))
   }, [])
+
+  const setEpicText = useCallback(
+    (id: string, field: EpicTextField, value: string) => {
+      setEpics((prev) =>
+        prev.map((e) => (e.id === id ? { ...e, [field]: value } : e)),
+      )
+    },
+    [],
+  )
 
   const deleteActor = useCallback((id: string) => {
     setActors((prev) => prev.filter((a) => a.id !== id))
@@ -171,6 +182,7 @@ export function useStudioData(): StudioDataApi {
     renameActor,
     renameEpic,
     recolorEpic,
+    setEpicText,
     deleteActor,
     deleteEpic,
     upsertCard,
