@@ -8,7 +8,14 @@ export interface Actor {
   name: string
   x: number
   y: number
+  // Free-text persona metadata.
+  description?: string
+  goals?: string
+  painPoints?: string
+  context?: string
 }
+
+export type ActorTextField = 'description' | 'goals' | 'painPoints' | 'context'
 
 export interface Epic {
   id: EpicId

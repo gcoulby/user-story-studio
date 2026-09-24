@@ -6,7 +6,7 @@ import {
   type StudioPreferences,
 } from '@/lib/storage'
 
-export type StudioView = 'graph' | 'stories' | 'table' | 'epics'
+export type StudioView = 'graph' | 'stories' | 'table' | 'epics' | 'actors'
 export type EditorState =
   | { mode: 'closed' }
   | { mode: 'new' }
@@ -33,6 +33,9 @@ export interface StudioSelectionApi {
   activeEpicFilter: string | null
   toggleEpicFilter: (epicId: string) => void
   clearEpicFilter: () => void
+  activeActorId: string | null
+  toggleActor: (actorId: string) => void
+  clearActor: () => void
   showEpicRegions: boolean
   setShowEpicRegions: (value: boolean) => void
 }
@@ -57,6 +60,8 @@ export function useStudioSelection(): StudioSelectionApi {
   const [activeEpicFilter, setActiveEpicFilter] = useState<string | null>(
     stored?.activeEpicFilter ?? DEFAULTS.activeEpicFilter,
   )
+  // Which actor the Actors view shows; null lists them all.
+  const [activeActorId, setActiveActorId] = useState<string | null>(null)
   const [showEpicRegions, setShowEpicRegionsState] = useState<boolean>(
     stored?.showEpicRegions ?? DEFAULTS.showEpicRegions,
   )
@@ -99,6 +104,12 @@ export function useStudioSelection(): StudioSelectionApi {
     setActiveEpicFilter((cur) => (cur === epicId ? null : epicId))
   }, [])
 
+  const toggleActor = useCallback((actorId: string) => {
+    setActiveActorId((cur) => (cur === actorId ? null : actorId))
+  }, [])
+
+  const clearActor = useCallback(() => setActiveActorId(null), [])
+
   const clearEpicFilter = useCallback(() => setActiveEpicFilter(null), [])
 
   const setShowEpicRegions = useCallback(
@@ -120,6 +131,9 @@ export function useStudioSelection(): StudioSelectionApi {
     activeEpicFilter,
     toggleEpicFilter,
     clearEpicFilter,
+    activeActorId,
+    toggleActor,
+    clearActor,
     showEpicRegions,
     setShowEpicRegions,
   }

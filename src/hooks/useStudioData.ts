@@ -5,6 +5,7 @@ import { newId } from '@/lib/id'
 import { nextEpicColor } from '@/config/palette'
 import type {
   Actor,
+  ActorTextField,
   Card,
   Epic,
   EpicTextField,
@@ -30,6 +31,7 @@ export interface StudioDataApi {
   renameActor: (id: string, name: string) => void
   renameEpic: (id: string, name: string) => void
   recolorEpic: (id: string, color: string) => void
+  setActorText: (id: string, field: ActorTextField, value: string) => void
   setEpicText: (id: string, field: EpicTextField, value: string) => void
   deleteActor: (id: string) => void
   deleteEpic: (id: string) => void
@@ -88,6 +90,15 @@ export function useStudioData(): StudioDataApi {
   const recolorEpic = useCallback((id: string, color: string) => {
     setEpics((prev) => prev.map((e) => (e.id === id ? { ...e, color } : e)))
   }, [])
+
+  const setActorText = useCallback(
+    (id: string, field: ActorTextField, value: string) => {
+      setActors((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, [field]: value } : a)),
+      )
+    },
+    [],
+  )
 
   const setEpicText = useCallback(
     (id: string, field: EpicTextField, value: string) => {
@@ -182,6 +193,7 @@ export function useStudioData(): StudioDataApi {
     renameActor,
     renameEpic,
     recolorEpic,
+    setActorText,
     setEpicText,
     deleteActor,
     deleteEpic,

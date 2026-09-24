@@ -46,10 +46,20 @@ export function AppSidebar({ data, selection, project }: AppSidebarProps) {
           </SidebarGroupLabel>
           <ActorList
             actors={data.actors}
+            activeActorId={selection.activeActorId}
+            onToggle={selection.toggleActor}
             onRename={data.renameActor}
             onDelete={data.deleteActor}
           />
           <AddInlineForm placeholder="Add actor…" onAdd={data.addActor} />
+          {selection.activeActorId && selection.view === 'actors' && (
+            <button
+              onClick={selection.clearActor}
+              className="mt-1 self-start text-xs text-blue-600 hover:underline"
+            >
+              show all actors ×
+            </button>
+          )}
         </SidebarGroup>
 
         <SidebarSeparator />

@@ -53,6 +53,15 @@ export function studioToMarkdown(data: StudioData, title: string): string {
 
   for (const group of groupCardsByActor(cards, actors)) {
     lines.push(`## ${group.actor.name}`, '')
+    const actorFields: [string, string | undefined][] = [
+      ['Description', group.actor.description],
+      ['Goals', group.actor.goals],
+      ['Pain points', group.actor.painPoints],
+      ['Context', group.actor.context],
+    ]
+    for (const [label, value] of actorFields) {
+      if (value?.trim()) lines.push(`**${label}**`, '', value.trim(), '')
+    }
     for (const card of group.cards) {
       lines.push(`### ${card.goal || 'Untitled story'}`, '')
       lines.push(`> ${storySentence(card, group.actor.name)}`, '')

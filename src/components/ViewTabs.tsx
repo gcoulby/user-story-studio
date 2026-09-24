@@ -1,4 +1,4 @@
-import { BookOpen, Layers, Table2, Workflow } from 'lucide-react'
+import { BookOpen, Layers, Table2, Users, Workflow } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import type { StudioView } from '@/hooks/useStudioSelection'
@@ -13,6 +13,7 @@ const TABS: { value: StudioView; label: string; icon: typeof Workflow }[] = [
   { value: 'stories', label: 'Stories', icon: BookOpen },
   { value: 'table', label: 'Table', icon: Table2 },
   { value: 'epics', label: 'Epics', icon: Layers },
+  { value: 'actors', label: 'Actors', icon: Users },
 ]
 
 export function ViewTabs({ view, onChange }: ViewTabsProps) {
