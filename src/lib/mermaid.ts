@@ -82,3 +82,50 @@ export function studioToMermaid(data: StudioData): string {
 
   return lines.join('\n')
 }
+
+// The focus cards plus the cards they are directly related to, so cross-actor
+// and cross-epic links stay visible without pulling in the whole map.
+function focusSubset(data: StudioData, focusIds: Set<string>): StudioData {
+  const included = new Set(focusIds)
+  for (const rel of data.relationships) {
+    if (focusIds.has(rel.sourceId)) included.add(rel.targetId)
+    if (focusIds.has(rel.targetId)) included.add(rel.sourceId)
+  }
+  const cards = data.cards.filter((c) => included.has(c.id))
+  const actorIds = new Set(cards.map((c) => c.actorId))
+  return {
+    ...data,
+    cards,
+    actors: data.actors.filter((a) => actorIds.has(a.id)),
+    relationships: data.relationships.filter(
+      (r) => included.has(r.sourceId) && included.has(r.targetId),
+    ),
+  }
+}
+
+// Diagram of one actor's stories and whatever they are related to.
+export function actorToMermaid(data: StudioData, actorId: string): string {
+  const focus = new Set(
+    data.cards.filter((c) => c.actorId === actorId).map((c) => c.id),
+  )
+  return studioToMermaid(focusSubset(data, focus))
+}
+
+// Diagram of one epic's stories and whatever they are related to. The epic's
+// own stories are grouped under it; related outsiders sit outside the box.
+export function epicToMermaid(data: StudioData, epicId: string): string {
+  const epic = data.epics.find((e) => e.id === epicId)
+  if (!epic) return ''
+  const focus = new Set(
+    data.cards.filter((c) => c.epicIds.includes(epicId)).map((c) => c.id),
+  )
+  const subset = focusSubset(data, focus)
+  return studioToMermaid({
+    ...subset,
+    epics: [epic],
+    cards: subset.cards.map((c) => ({
+      ...c,
+      epicIds: focus.has(c.id) ? [epicId] : [],
+    })),
+  })
+}

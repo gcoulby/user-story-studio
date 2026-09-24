@@ -1,6 +1,6 @@
 import { RELATIONSHIP_TYPES } from '@/config/relationship-types'
 import { groupCardsByActor, storySentence } from '@/lib/cards'
-import { studioToMermaid } from '@/lib/mermaid'
+import { actorToMermaid, epicToMermaid, studioToMermaid } from '@/lib/mermaid'
 import type { StudioData } from '@/types/domain'
 
 // Human-readable rendering of a user story map: stories grouped by actor, each
@@ -40,6 +40,10 @@ export function studioToMarkdown(data: StudioData, title: string): string {
         if (value?.trim()) lines.push(`**${label}**`, '', value.trim(), '')
       }
       const members = cards.filter((c) => c.epicIds.includes(epic.id))
+      const epicDiagram = epicToMermaid(data, epic.id)
+      if (epicDiagram) {
+        lines.push('```mermaid', epicDiagram, '```', '')
+      }
       if (members.length > 0) {
         lines.push('**Requirements**', '')
         for (const card of members) {
@@ -62,6 +66,7 @@ export function studioToMarkdown(data: StudioData, title: string): string {
     for (const [label, value] of actorFields) {
       if (value?.trim()) lines.push(`**${label}**`, '', value.trim(), '')
     }
+    lines.push('```mermaid', actorToMermaid(data, group.actor.id), '```', '')
     for (const card of group.cards) {
       lines.push(`### ${card.goal || 'Untitled story'}`, '')
       lines.push(`> ${storySentence(card, group.actor.name)}`, '')
