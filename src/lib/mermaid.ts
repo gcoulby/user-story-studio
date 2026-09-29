@@ -1,4 +1,5 @@
 import { RELATIONSHIP_TYPES } from '@/config/relationship-types'
+import { isStretch } from '@/lib/cards'
 import type { StudioData } from '@/types/domain'
 
 // Mermaid node ids must be alphanumeric/underscore; entity ids may contain
@@ -77,6 +78,14 @@ export function studioToMermaid(data: StudioData): string {
     lines.push(
       '  classDef actor fill:#1f2937,color:#f9fafb,stroke:#111827;',
       `  class ${actors.map((a) => nodeId('a', a.id)).join(',')} actor;`,
+    )
+  }
+
+  const stretchCards = cards.filter(isStretch)
+  if (stretchCards.length > 0) {
+    lines.push(
+      '  classDef stretch stroke-dasharray: 4 3;',
+      `  class ${stretchCards.map((c) => nodeId('c', c.id)).join(',')} stretch;`,
     )
   }
 

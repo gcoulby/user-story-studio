@@ -1,5 +1,6 @@
 import { EpicChip } from '@/components/EpicChip'
-import { cardEpics } from '@/lib/cards'
+import { StretchBadge } from '@/components/StretchBadge'
+import { cardEpics, isStretch } from '@/lib/cards'
 import { cn } from '@/lib/utils'
 import type { Card, Epic, Relationship } from '@/types/domain'
 
@@ -37,6 +38,7 @@ export function TableRow({
       </td>
       <td className="px-2.5 py-2 text-muted-foreground">{actorName}</td>
       <td className="px-2.5 py-2 text-muted-foreground">{card.benefit || '—'}</td>
+      <td className="px-2.5 py-2">{isStretch(card) && <StretchBadge />}</td>
       <td className="px-2.5 py-2">
         <div className="flex flex-wrap gap-1">
           {cardEpics(card, epics).map((epic) => (

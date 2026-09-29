@@ -23,6 +23,7 @@ export function createEmptyCard(
     conversation: '',
     confirmation: [],
     epicIds: [],
+    commitment: 'committed',
     ...position,
   }
 }

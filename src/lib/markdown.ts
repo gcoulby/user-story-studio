@@ -1,5 +1,5 @@
 import { RELATIONSHIP_TYPES } from '@/config/relationship-types'
-import { groupCardsByActor, storySentence } from '@/lib/cards'
+import { groupCardsByActor, isStretch, storySentence } from '@/lib/cards'
 import { actorToMermaid, epicToMermaid, studioToMermaid } from '@/lib/mermaid'
 import type { StudioData } from '@/types/domain'
 
@@ -48,7 +48,10 @@ export function studioToMarkdown(data: StudioData, title: string): string {
         lines.push('**Requirements**', '')
         for (const card of members) {
           const actor = actors.find((a) => a.id === card.actorId)?.name
-          lines.push(`- ${actor ? `${actor}: ` : ''}${card.goal || 'Untitled story'}`)
+          const stretchTag = isStretch(card) ? ' _(stretch)_' : ''
+          lines.push(
+            `- ${actor ? `${actor}: ` : ''}${card.goal || 'Untitled story'}${stretchTag}`,
+          )
         }
         lines.push('')
       }
@@ -68,7 +71,8 @@ export function studioToMarkdown(data: StudioData, title: string): string {
     }
     lines.push('```mermaid', actorToMermaid(data, group.actor.id), '```', '')
     for (const card of group.cards) {
-      lines.push(`### ${card.goal || 'Untitled story'}`, '')
+      const stretchTag = isStretch(card) ? ' _(stretch)_' : ''
+      lines.push(`### ${card.goal || 'Untitled story'}${stretchTag}`, '')
       lines.push(`> ${storySentence(card, group.actor.name)}`, '')
 
       if (card.trigger) lines.push(`- **When:** ${card.trigger}`)

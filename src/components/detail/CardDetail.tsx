@@ -1,6 +1,8 @@
 import { Link2, Pencil, Trash2 } from 'lucide-react'
 
 import { EpicChip } from '@/components/EpicChip'
+import { StretchBadge } from '@/components/StretchBadge'
+import { isStretch } from '@/lib/cards'
 import { Button } from '@/components/ui/button'
 import { cardEpics } from '@/lib/cards'
 import type { NewRelationshipInput } from '@/hooks/useStudioData'
@@ -66,8 +68,9 @@ export function CardDetail({
         {card.goal}
       </h2>
 
-      {chips.length > 0 && (
+      {(chips.length > 0 || isStretch(card)) && (
         <div className="mb-4 flex flex-wrap gap-1.5">
+          {isStretch(card) && <StretchBadge />}
           {chips.map((epic) => (
             <EpicChip key={epic.id} epic={epic} />
           ))}

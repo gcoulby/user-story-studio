@@ -13,7 +13,7 @@ interface TableViewProps {
   onSelect: (id: string) => void
 }
 
-const HEADINGS = ['I want to', 'Actor', 'So that', 'Epics', 'Criteria', 'Links']
+const HEADINGS = ['I want to', 'Actor', 'So that', 'Status', 'Epics', 'Criteria', 'Links']
 
 export function TableView({
   cards,

@@ -49,9 +49,14 @@ export interface Card {
   conversation: string
   confirmation: AcceptanceCriterion[]
   epicIds: EpicId[]
+  // Absent/'committed' means committed; only 'stretch' marks it as a stretch
+  // or uncommitted story for the release.
+  commitment?: CardCommitment
   x: number
   y: number
 }
+
+export type CardCommitment = 'committed' | 'stretch'
 
 export type RelationshipType = 'includes' | 'extends' | 'precedes'
 

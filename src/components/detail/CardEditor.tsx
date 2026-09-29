@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Plus, Trash2, X } from 'lucide-react'
 
 import { EpicChip } from '@/components/EpicChip'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -101,6 +102,25 @@ export function CardEditor({
             <Trash2 size={13} />
           </Button>
         )}
+      </div>
+
+      <Label>Commitment</Label>
+      <div className="mb-3 mt-1 inline-flex rounded-md border border-border p-0.5">
+        {(['committed', 'stretch'] as const).map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => set('commitment')(option)}
+            className={cn(
+              'rounded-[5px] px-3 py-1 text-xs font-medium capitalize transition-colors',
+              (draft.commitment ?? 'committed') === option
+                ? 'bg-foreground text-background'
+                : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {option}
+          </button>
+        ))}
       </div>
 
       <Label>Actor</Label>

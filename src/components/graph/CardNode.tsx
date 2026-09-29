@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react'
 
 import { CARD_H, CARD_W } from '@/config/graph'
+import { isStretch } from '@/lib/cards'
 import { cn } from '@/lib/utils'
 
 import type { CardNodeType } from './types'
@@ -11,17 +12,20 @@ const HANDLE_CLASS = '!h-1 !w-1 !border-0 !bg-transparent'
 // react-flow's own onNodeClick handles the click-vs-drag distinction.
 export function CardNode({ data, selected }: NodeProps<CardNodeType>) {
   const { card, actorLabel, epics, dimmed } = data
+  const stretch = isStretch(card)
 
   return (
     <div
       className={cn(
         'elevation-1 rounded-lg border bg-card px-3.5 py-3 text-left transition-opacity',
         selected ? 'border-foreground ring-1 ring-foreground' : 'border-border',
+        stretch && 'border-dashed',
       )}
       style={{ width: CARD_W, minHeight: CARD_H, opacity: dimmed ? 0.25 : 1 }}
     >
-      <div className="font-mono text-[9.5px] uppercase tracking-wide text-muted-foreground">
+      <div className="flex items-center justify-between gap-1.5 font-mono text-[9.5px] uppercase tracking-wide text-muted-foreground">
         {actorLabel}
+        {stretch && <span>Stretch</span>}
       </div>
       <div className="mt-1 text-[13px] leading-snug text-foreground">
         <span className="text-muted-foreground">I want to </span>

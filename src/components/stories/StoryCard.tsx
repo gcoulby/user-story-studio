@@ -1,5 +1,6 @@
 import { EpicChip } from '@/components/EpicChip'
-import { cardEpics } from '@/lib/cards'
+import { StretchBadge } from '@/components/StretchBadge'
+import { cardEpics, isStretch } from '@/lib/cards'
 import { cn } from '@/lib/utils'
 import type { Card, Epic } from '@/types/domain'
 
@@ -46,8 +47,9 @@ export function StoryCard({
           when: {card.trigger}
         </p>
       )}
-      {cardEpics(card, epics).length > 0 && (
+      {(cardEpics(card, epics).length > 0 || isStretch(card)) && (
         <div className="mt-2 flex flex-wrap gap-1.5">
+          {isStretch(card) && <StretchBadge />}
           {cardEpics(card, epics).map((epic) => (
             <EpicChip key={epic.id} epic={epic} />
           ))}

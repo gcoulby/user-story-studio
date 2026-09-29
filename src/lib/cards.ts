@@ -31,6 +31,10 @@ export function groupCardsByActor(
     .filter((group) => group.cards.length > 0)
 }
 
+export function isStretch(card: Card): boolean {
+  return card.commitment === 'stretch'
+}
+
 export function storySentence(card: Card, actorName: string): string {
   const goal = card.goal || '…'
   const base = `As a ${actorName}, I want to ${goal}`
