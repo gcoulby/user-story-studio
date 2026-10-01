@@ -7,7 +7,13 @@ import { seedRelationships } from './seed-relationships'
 
 // A brand-new map. This is the default state on first run.
 export function emptyStudioData(): StudioData {
-  return { actors: [], epics: [], cards: [], relationships: [] }
+  return {
+    actors: [],
+    epics: [],
+    cards: [],
+    relationships: [],
+    piVision: { epicPriority: [], objectives: [] },
+  }
 }
 
 // The bundled example ("Taskboard"), loaded on demand via "Open example".
@@ -17,5 +23,9 @@ export function loadExampleData(): StudioData {
     epics: seedEpics,
     cards: seedCards,
     relationships: seedRelationships,
+    piVision: {
+      epicPriority: seedEpics.map((e) => e.id),
+      objectives: [],
+    },
   }
 }

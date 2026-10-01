@@ -1,12 +1,28 @@
-import { Link2, Pencil, Trash2 } from 'lucide-react'
+import { Layers2, Link2, Pencil, Trash2 } from 'lucide-react'
 
 import { EpicChip } from '@/components/EpicChip'
+import { PriorityBadge } from '@/components/PriorityBadge'
 import { StretchBadge } from '@/components/StretchBadge'
 import { isStretch } from '@/lib/cards'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { cn } from '@/lib/utils'
 import { cardEpics } from '@/lib/cards'
+import { DEFAULT_PRIORITY, PRIORITIES, PRIORITY_ORDER } from '@/config/priority'
 import type { NewRelationshipInput } from '@/hooks/useStudioData'
-import type { Card, Epic, Relationship } from '@/types/domain'
+import type {
+  Card,
+  CardCommitment,
+  CardPriority,
+  Epic,
+  Relationship,
+} from '@/types/domain'
 
 import { FieldBlock } from './FieldBlock'
 import { RelationshipManager } from './RelationshipManager'
@@ -19,6 +35,9 @@ interface CardDetailProps {
   relationships: Relationship[]
   onEdit: () => void
   onDelete: () => void
+  onToggleEpic: (epicId: string) => void
+  onSetPriority: (priority: CardPriority) => void
+  onSetCommitment: (commitment: CardCommitment) => void
   onAddRelationship: (input: NewRelationshipInput) => void
   onRemoveRelationship: (id: string) => void
 }
@@ -33,6 +52,9 @@ export function CardDetail({
   relationships,
   onEdit,
   onDelete,
+  onToggleEpic,
+  onSetPriority,
+  onSetCommitment,
   onAddRelationship,
   onRemoveRelationship,
 }: CardDetailProps) {
@@ -68,9 +90,14 @@ export function CardDetail({
         {card.goal}
       </h2>
 
-      {(chips.length > 0 || isStretch(card)) && (
+      {(chips.length > 0 ||
+        isStretch(card) ||
+        (card.priority && card.priority !== 'medium')) && (
         <div className="mb-4 flex flex-wrap gap-1.5">
           {isStretch(card) && <StretchBadge />}
+          {card.priority && card.priority !== 'medium' && (
+            <PriorityBadge priority={card.priority} />
+          )}
           {chips.map((epic) => (
             <EpicChip key={epic.id} epic={epic} />
           ))}
@@ -118,6 +145,60 @@ export function CardDetail({
             No acceptance criteria yet.
           </div>
         )}
+      </FieldBlock>
+
+      <FieldBlock label="Planning" icon={<Layers2 size={11} />}>
+        <div className="mb-2.5 flex flex-wrap gap-1.5">
+          {epics.map((epic) => (
+            <EpicChip
+              key={epic.id}
+              epic={epic}
+              selected={card.epicIds.includes(epic.id)}
+              onClick={() => onToggleEpic(epic.id)}
+            />
+          ))}
+          {epics.length === 0 && (
+            <span className="text-xs italic text-muted-foreground">
+              No epics yet.
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Select
+            value={card.priority ?? DEFAULT_PRIORITY}
+            onValueChange={(value) => onSetPriority(value as CardPriority)}
+          >
+            <SelectTrigger className="h-8 w-28 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PRIORITY_ORDER.map((p) => (
+                <SelectItem key={p} value={p}>
+                  {PRIORITIES[p].label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <div className="inline-flex rounded-md border border-border p-0.5">
+            {(['committed', 'stretch'] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => onSetCommitment(option)}
+                className={cn(
+                  'rounded-[5px] px-2.5 py-1 text-xs font-medium capitalize transition-colors',
+                  (card.commitment ?? 'committed') === option
+                    ? 'bg-foreground text-background'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
       </FieldBlock>
 
       <FieldBlock label="Relationships" icon={<Link2 size={11} />}>

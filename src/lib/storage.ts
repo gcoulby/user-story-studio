@@ -7,7 +7,7 @@ export const PREFERENCES_KEY = 'user-story-studio:preferences'
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
 export interface StudioPreferences {
-  view: 'graph' | 'stories' | 'table' | 'epics' | 'actors'
+  view: 'graph' | 'stories' | 'table' | 'epics' | 'actors' | 'pi'
   activeEpicFilter: string | null
   selectedCardId: string | null
   showEpicRegions: boolean

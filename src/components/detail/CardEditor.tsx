@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { createEmptyCard } from '@/lib/create-card'
 import { newId } from '@/lib/id'
 import { readLastActorId, writeLastActorId } from '@/lib/storage'
+import { DEFAULT_PRIORITY, PRIORITIES, PRIORITY_ORDER } from '@/config/priority'
 import type { Actor, Card, Epic } from '@/types/domain'
 
 interface CardEditorProps {
@@ -122,6 +123,23 @@ export function CardEditor({
           </button>
         ))}
       </div>
+
+      <Label>Priority</Label>
+      <Select
+        value={draft.priority ?? DEFAULT_PRIORITY}
+        onValueChange={(value) => set('priority')(value as Card['priority'])}
+      >
+        <SelectTrigger className="mb-3 mt-1">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {PRIORITY_ORDER.map((p) => (
+            <SelectItem key={p} value={p}>
+              {PRIORITIES[p].label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       <Label>Actor</Label>
       <Select

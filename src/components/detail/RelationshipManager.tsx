@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { CardCombobox } from '@/components/detail/CardCombobox'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -65,7 +66,7 @@ export function RelationshipManager({
               style={{ background: display.color }}
             />
             <span className="text-[13px] text-foreground">
-              {outgoing ? display.label : `${display.label} by`}{' '}
+              {outgoing ? display.label : display.inverseLabel}{' '}
               <b className="font-medium">{other?.goal ?? '(deleted)'}</b>
               {relationship.note && (
                 <span className="text-muted-foreground">
@@ -101,18 +102,12 @@ export function RelationshipManager({
               ))}
             </SelectContent>
           </Select>
-          <Select value={targetId} onValueChange={setTargetId}>
-            <SelectTrigger className="h-8 min-w-0 flex-1 text-xs">
-              <SelectValue placeholder="target card…" />
-            </SelectTrigger>
-            <SelectContent>
-              {otherCards.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.goal || c.id}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CardCombobox
+            cards={otherCards}
+            value={targetId}
+            onChange={setTargetId}
+            placeholder="target card…"
+          />
         </div>
         {type === 'extends' && (
           <Input

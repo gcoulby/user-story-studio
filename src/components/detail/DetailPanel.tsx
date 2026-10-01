@@ -69,6 +69,13 @@ export function DetailPanel({ data, selection }: DetailPanelProps) {
           data.deleteCard(selectedCard.id)
           selection.selectCard(null)
         }}
+        onToggleEpic={(epicId) => data.toggleCardEpic(selectedCard.id, epicId)}
+        onSetPriority={(priority) =>
+          data.setCardPriority(selectedCard.id, priority)
+        }
+        onSetCommitment={(commitment) =>
+          data.setCardCommitment(selectedCard.id, commitment)
+        }
         onAddRelationship={data.addRelationship}
         onRemoveRelationship={data.removeRelationship}
       />

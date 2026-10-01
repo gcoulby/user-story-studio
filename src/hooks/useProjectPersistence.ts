@@ -34,6 +34,7 @@ interface DataPort {
   epics: StudioData['epics']
   cards: StudioData['cards']
   relationships: StudioData['relationships']
+  piVision: StudioData['piVision']
   snapshot: () => StudioData
   replaceAll: (data: StudioData) => void
 }
@@ -165,6 +166,7 @@ export function useProjectPersistence(data: DataPort): ProjectPersistenceApi {
     data.epics,
     data.cards,
     data.relationships,
+    data.piVision,
     hydrating,
     persistToIdb,
     writeBoundFile,

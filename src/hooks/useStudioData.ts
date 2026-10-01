@@ -7,8 +7,12 @@ import type {
   Actor,
   ActorTextField,
   Card,
+  CardCommitment,
+  CardPriority,
   Epic,
   EpicTextField,
+  PiObjective,
+  PiVision,
   Relationship,
   RelationshipType,
   StudioData,
@@ -21,11 +25,18 @@ export interface NewRelationshipInput {
   note?: string
 }
 
+export type PiTextField =
+  | 'highLevelVision'
+  | 'visionDetails'
+  | 'demonstrationOutline'
+  | 'risksAndDependencies'
+
 export interface StudioDataApi {
   actors: Actor[]
   epics: Epic[]
   cards: Card[]
   relationships: Relationship[]
+  piVision: PiVision
   addActor: (name: string) => void
   addEpic: (name: string) => void
   renameActor: (id: string, name: string) => void
@@ -36,11 +47,20 @@ export interface StudioDataApi {
   deleteActor: (id: string) => void
   deleteEpic: (id: string) => void
   upsertCard: (card: Card) => void
+  toggleCardEpic: (id: string, epicId: string) => void
+  setCardPriority: (id: string, priority: CardPriority) => void
+  setCardCommitment: (id: string, commitment: CardCommitment) => void
   deleteCard: (id: string) => void
   moveCard: (id: string, x: number, y: number) => void
   moveActor: (id: string, x: number, y: number) => void
   addRelationship: (input: NewRelationshipInput) => void
   removeRelationship: (id: string) => void
+  setPiText: (field: PiTextField, value: string) => void
+  setPiTimeframe: (start: string, end: string) => void
+  addPiObjective: (text: string) => void
+  updatePiObjective: (id: string, patch: Partial<Omit<PiObjective, 'id'>>) => void
+  removePiObjective: (id: string) => void
+  reorderEpicPriority: (epicIds: string[]) => void
   replaceAll: (data: StudioData) => void
   snapshot: () => StudioData
 }
@@ -53,6 +73,7 @@ export function useStudioData(): StudioDataApi {
   const [relationships, setRelationships] = useState<Relationship[]>(
     initial.relationships,
   )
+  const [piVision, setPiVision] = useState<PiVision>(initial.piVision)
 
   const addActor = useCallback(
     (name: string) => {
@@ -69,10 +90,15 @@ export function useStudioData(): StudioDataApi {
   const addEpic = useCallback((name: string) => {
     const trimmed = name.trim()
     if (!trimmed) return
+    const id = newId('e')
     setEpics((prev) => [
       ...prev,
-      { id: newId('e'), name: trimmed, color: nextEpicColor(prev.length) },
+      { id, name: trimmed, color: nextEpicColor(prev.length) },
     ])
+    setPiVision((prev) => ({
+      ...prev,
+      epicPriority: [...prev.epicPriority, id],
+    }))
   }, [])
 
   const renameActor = useCallback((id: string, name: string) => {
@@ -125,6 +151,15 @@ export function useStudioData(): StudioDataApi {
           : c,
       ),
     )
+    setPiVision((prev) => ({
+      ...prev,
+      epicPriority: prev.epicPriority.filter((e) => e !== id),
+      objectives: prev.objectives.map((o) =>
+        o.epicIds.includes(id)
+          ? { ...o, epicIds: o.epicIds.filter((e) => e !== id) }
+          : o,
+      ),
+    }))
   }, [])
 
   const upsertCard = useCallback((card: Card) => {
@@ -134,6 +169,37 @@ export function useStudioData(): StudioDataApi {
         : [...prev, card],
     )
   }, [])
+
+  const patchCard = useCallback((id: string, patch: Partial<Card>) => {
+    setCards((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+    )
+  }, [])
+
+  const toggleCardEpic = useCallback((id: string, epicId: string) => {
+    setCards((prev) =>
+      prev.map((c) =>
+        c.id === id
+          ? {
+              ...c,
+              epicIds: c.epicIds.includes(epicId)
+                ? c.epicIds.filter((e) => e !== epicId)
+                : [...c.epicIds, epicId],
+            }
+          : c,
+      ),
+    )
+  }, [])
+
+  const setCardPriority = useCallback(
+    (id: string, priority: CardPriority) => patchCard(id, { priority }),
+    [patchCard],
+  )
+
+  const setCardCommitment = useCallback(
+    (id: string, commitment: CardCommitment) => patchCard(id, { commitment }),
+    [patchCard],
+  )
 
   const deleteCard = useCallback((id: string) => {
     setCards((prev) => prev.filter((c) => c.id !== id))
@@ -171,16 +237,69 @@ export function useStudioData(): StudioDataApi {
     setRelationships((prev) => prev.filter((r) => r.id !== id))
   }, [])
 
+  const setPiText = useCallback((field: PiTextField, value: string) => {
+    setPiVision((prev) => ({ ...prev, [field]: value }))
+  }, [])
+
+  const setPiTimeframe = useCallback((start: string, end: string) => {
+    setPiVision((prev) => ({
+      ...prev,
+      timeframeStart: start || undefined,
+      timeframeEnd: end || undefined,
+    }))
+  }, [])
+
+  const addPiObjective = useCallback((text: string) => {
+    const trimmed = text.trim()
+    if (!trimmed) return
+    setPiVision((prev) => ({
+      ...prev,
+      objectives: [
+        ...prev.objectives,
+        { id: newId('obj'), text: trimmed, epicIds: [] },
+      ],
+    }))
+  }, [])
+
+  const updatePiObjective = useCallback(
+    (id: string, patch: Partial<Omit<PiObjective, 'id'>>) => {
+      setPiVision((prev) => ({
+        ...prev,
+        objectives: prev.objectives.map((o) =>
+          o.id === id ? { ...o, ...patch } : o,
+        ),
+      }))
+    },
+    [],
+  )
+
+  const removePiObjective = useCallback((id: string) => {
+    setPiVision((prev) => ({
+      ...prev,
+      objectives: prev.objectives.filter((o) => o.id !== id),
+    }))
+  }, [])
+
+  const reorderEpicPriority = useCallback((epicIds: string[]) => {
+    setPiVision((prev) => ({ ...prev, epicPriority: epicIds }))
+  }, [])
+
   const replaceAll = useCallback((data: StudioData) => {
     setActors(data.actors)
     setEpics(data.epics)
     setCards(data.cards)
     setRelationships(data.relationships)
+    const loadedPiVision: Partial<PiVision> | undefined = data.piVision
+    setPiVision({
+      ...loadedPiVision,
+      epicPriority: loadedPiVision?.epicPriority ?? [],
+      objectives: loadedPiVision?.objectives ?? [],
+    })
   }, [])
 
   const snapshot = useCallback(
-    (): StudioData => ({ actors, epics, cards, relationships }),
-    [actors, epics, cards, relationships],
+    (): StudioData => ({ actors, epics, cards, relationships, piVision }),
+    [actors, epics, cards, relationships, piVision],
   )
 
   return {
@@ -188,6 +307,7 @@ export function useStudioData(): StudioDataApi {
     epics,
     cards,
     relationships,
+    piVision,
     addActor,
     addEpic,
     renameActor,
@@ -198,11 +318,20 @@ export function useStudioData(): StudioDataApi {
     deleteActor,
     deleteEpic,
     upsertCard,
+    toggleCardEpic,
+    setCardPriority,
+    setCardCommitment,
     deleteCard,
     moveCard,
     moveActor,
     addRelationship,
     removeRelationship,
+    setPiText,
+    setPiTimeframe,
+    addPiObjective,
+    updatePiObjective,
+    removePiObjective,
+    reorderEpicPriority,
     replaceAll,
     snapshot,
   }

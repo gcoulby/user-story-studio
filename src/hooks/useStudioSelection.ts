@@ -6,7 +6,7 @@ import {
   type StudioPreferences,
 } from '@/lib/storage'
 
-export type StudioView = 'graph' | 'stories' | 'table' | 'epics' | 'actors'
+export type StudioView = 'graph' | 'stories' | 'table' | 'epics' | 'actors' | 'pi'
 export type EditorState =
   | { mode: 'closed' }
   | { mode: 'new' }

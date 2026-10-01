@@ -3,6 +3,7 @@ import { DetailPanel } from '@/components/detail/DetailPanel'
 import { ActorsView } from '@/components/actors/ActorsView'
 import { EpicsView } from '@/components/epics/EpicsView'
 import { EmptyState } from '@/components/EmptyState'
+import { PiView } from '@/components/pi/PiView'
 import { SaveStatus } from '@/components/SaveStatus'
 import { AppSidebar } from '@/components/sidebar/AppSidebar'
 import { StoriesView } from '@/components/stories/StoriesView'
@@ -65,7 +66,8 @@ export default function App() {
               <div className="flex min-h-0 flex-1">
                 <main className="relative min-w-0 flex-1 bg-surface">
                   {!hasCards && selection.view !== 'epics' &&
-                    selection.view !== 'actors' && (
+                    selection.view !== 'actors' &&
+                    selection.view !== 'pi' && (
                     <EmptyState
                       onNewCard={selection.openNewCard}
                       onOpenExample={() => void project.openExample()}
@@ -122,6 +124,18 @@ export default function App() {
                       onSelectCard={selection.selectCard}
                       onRename={data.renameActor}
                       onTextChange={data.setActorText}
+                    />
+                  )}
+                  {selection.view === 'pi' && (
+                    <PiView
+                      piVision={data.piVision}
+                      epics={data.epics}
+                      onTextChange={data.setPiText}
+                      onTimeframeChange={data.setPiTimeframe}
+                      onAddObjective={data.addPiObjective}
+                      onUpdateObjective={data.updatePiObjective}
+                      onRemoveObjective={data.removePiObjective}
+                      onReorderEpicPriority={data.reorderEpicPriority}
                     />
                   )}
                 </main>

@@ -7,7 +7,7 @@ import type { StudioData } from '@/types/domain'
 // with its trigger, conversation notes, acceptance criteria, epics and typed
 // relationships spelled out in prose.
 export function studioToMarkdown(data: StudioData, title: string): string {
-  const { actors, epics, cards, relationships } = data
+  const { actors, epics, cards, relationships, piVision } = data
   const epicName = (id: string) => epics.find((e) => e.id === id)?.name ?? id
   const cardGoal = (id: string) =>
     cards.find((c) => c.id === id)?.goal ?? '(deleted card)'
@@ -20,6 +20,66 @@ export function studioToMarkdown(data: StudioData, title: string): string {
       `${epics.length} ${plural(epics.length, 'epic')}._`,
     '',
   )
+
+  const hasExecSummary =
+    piVision.highLevelVision?.trim() ||
+    piVision.visionDetails?.trim() ||
+    piVision.demonstrationOutline?.trim() ||
+    piVision.risksAndDependencies?.trim() ||
+    piVision.timeframeStart ||
+    piVision.objectives.length > 0
+
+  if (hasExecSummary) {
+    lines.push('## Executive Summary', '')
+
+    if (piVision.highLevelVision?.trim()) {
+      lines.push(`**Vision:** ${piVision.highLevelVision.trim()}`, '')
+    }
+    if (piVision.timeframeStart || piVision.timeframeEnd) {
+      lines.push(
+        `**Timeframe:** ${piVision.timeframeStart ?? '?'} – ${piVision.timeframeEnd ?? '?'}`,
+        '',
+      )
+    }
+
+    if (piVision.objectives.length > 0) {
+      lines.push('### Objectives', '')
+      for (const objective of piVision.objectives) {
+        const linked = objective.epicIds.map(epicName).join(', ')
+        lines.push(`- ${objective.text}${linked ? ` (Epics: ${linked})` : ''}`)
+      }
+      lines.push('')
+    }
+
+    const prioritized = piVision.epicPriority
+      .map((id) => epics.find((e) => e.id === id))
+      .filter((e): e is (typeof epics)[number] => e !== undefined)
+    if (prioritized.length > 0) {
+      lines.push('### Epic Priority', '')
+      prioritized.forEach((epic, i) => lines.push(`${i + 1}. ${epic.name}`))
+      lines.push('')
+    }
+
+    if (piVision.visionDetails?.trim()) {
+      lines.push('### Vision Details', '', piVision.visionDetails.trim(), '')
+    }
+    if (piVision.demonstrationOutline?.trim()) {
+      lines.push(
+        '### Demonstration Outline',
+        '',
+        piVision.demonstrationOutline.trim(),
+        '',
+      )
+    }
+    if (piVision.risksAndDependencies?.trim()) {
+      lines.push(
+        '### Risks & Dependencies',
+        '',
+        piVision.risksAndDependencies.trim(),
+        '',
+      )
+    }
+  }
 
   const diagram = studioToMermaid(data)
   if (diagram) {

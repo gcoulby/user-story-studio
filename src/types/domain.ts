@@ -52,13 +52,24 @@ export interface Card {
   // Absent/'committed' means committed; only 'stretch' marks it as a stretch
   // or uncommitted story for the release.
   commitment?: CardCommitment
+  // Absent means 'medium'.
+  priority?: CardPriority
   x: number
   y: number
 }
 
 export type CardCommitment = 'committed' | 'stretch'
 
-export type RelationshipType = 'includes' | 'extends' | 'precedes'
+export type CardPriority = 'low' | 'medium' | 'high' | 'critical'
+
+export type RelationshipType =
+  | 'includes'
+  | 'extends'
+  | 'precedes'
+  | 'blocks'
+  | 'dependsOn'
+  | 'relatesTo'
+  | 'supersedes'
 
 export interface Relationship {
   id: RelationshipId
@@ -68,9 +79,27 @@ export interface Relationship {
   note?: string // only meaningful for "extends" — the condition
 }
 
+export interface PiObjective {
+  id: string
+  text: string
+  epicIds: EpicId[]
+}
+
+export interface PiVision {
+  highLevelVision?: string
+  visionDetails?: string
+  demonstrationOutline?: string
+  risksAndDependencies?: string
+  timeframeStart?: string // ISO date (yyyy-mm-dd)
+  timeframeEnd?: string
+  epicPriority: EpicId[] // ordered, highest priority first
+  objectives: PiObjective[]
+}
+
 export interface StudioData {
   actors: Actor[]
   epics: Epic[]
   cards: Card[]
   relationships: Relationship[]
+  piVision: PiVision
 }

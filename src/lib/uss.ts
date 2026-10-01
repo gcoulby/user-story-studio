@@ -5,6 +5,7 @@ import type {
   Actor,
   Card,
   Epic,
+  PiVision,
   Relationship,
   StudioData,
 } from '@/types/domain'
@@ -21,8 +22,11 @@ const FILES = {
   epics: 'data/epics.json',
   cards: 'data/cards.json',
   relationships: 'data/relationships.json',
+  piVision: 'data/piVision.json',
 } as const
 const STORIES_MD = 'stories.md'
+
+const EMPTY_PI_VISION: PiVision = { epicPriority: [], objectives: [] }
 
 function json(value: unknown): Uint8Array {
   return strToU8(JSON.stringify(value, null, 2))
@@ -33,6 +37,18 @@ function parseArray<T>(files: Record<string, Uint8Array>, path: string): T[] {
   if (!entry) return []
   const parsed = JSON.parse(strFromU8(entry)) as unknown
   return Array.isArray(parsed) ? (parsed as T[]) : []
+}
+
+function parsePiVision(files: Record<string, Uint8Array>, path: string): PiVision {
+  const entry = files[path]
+  if (!entry) return EMPTY_PI_VISION
+  const parsed = JSON.parse(strFromU8(entry)) as Partial<PiVision>
+  return {
+    ...EMPTY_PI_VISION,
+    ...parsed,
+    epicPriority: parsed.epicPriority ?? [],
+    objectives: parsed.objectives ?? [],
+  }
 }
 
 // Packs a project into a .uss archive: a zip of the manifest, one JSON file per
@@ -50,6 +66,7 @@ export function packUss(project: Project): Uint8Array {
       [FILES.epics]: json(data.epics),
       [FILES.cards]: json(data.cards),
       [FILES.relationships]: json(data.relationships),
+      [FILES.piVision]: json(data.piVision),
       [STORIES_MD]: strToU8(studioToMarkdown(data, manifest.title)),
     },
     { level: 6 },
@@ -73,6 +90,7 @@ export function unpackUss(bytes: Uint8Array): Project {
     epics: parseArray<Epic>(files, FILES.epics),
     cards: parseArray<Card>(files, FILES.cards),
     relationships: parseArray<Relationship>(files, FILES.relationships),
+    piVision: parsePiVision(files, FILES.piVision),
   }
 
   return { manifest: { ...newManifest(manifest.title), ...manifest }, data }
