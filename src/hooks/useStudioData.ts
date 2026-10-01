@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 
 import { emptyStudioData } from '@/data/load-studio-data'
 import { newId } from '@/lib/id'
+import { normalizePiVision } from '@/lib/pi-vision'
 import { nextEpicColor } from '@/config/palette'
 import type {
   Actor,
@@ -289,21 +290,16 @@ export function useStudioData(): StudioDataApi {
     setEpics(data.epics)
     setCards(data.cards)
     setRelationships(data.relationships)
-    const loadedPiVision: Partial<PiVision> | undefined = data.piVision
-    const loadedPriority = loadedPiVision?.epicPriority ?? []
+    const loadedPiVision = normalizePiVision(data.piVision)
     const epicIds = data.epics.map((e) => e.id)
     // Keep epicPriority a permutation of the loaded epics: drop stale ids
     // (deleted epics) and append any epic missing from it (older saves
     // predate this field, or an epic was added before it existed).
     const epicPriority = [
-      ...loadedPriority.filter((id) => epicIds.includes(id)),
-      ...epicIds.filter((id) => !loadedPriority.includes(id)),
+      ...loadedPiVision.epicPriority.filter((id) => epicIds.includes(id)),
+      ...epicIds.filter((id) => !loadedPiVision.epicPriority.includes(id)),
     ]
-    setPiVision({
-      ...loadedPiVision,
-      epicPriority,
-      objectives: loadedPiVision?.objectives ?? [],
-    })
+    setPiVision({ ...loadedPiVision, epicPriority })
   }, [])
 
   const snapshot = useCallback(
