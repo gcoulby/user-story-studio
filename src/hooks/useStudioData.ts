@@ -290,9 +290,18 @@ export function useStudioData(): StudioDataApi {
     setCards(data.cards)
     setRelationships(data.relationships)
     const loadedPiVision: Partial<PiVision> | undefined = data.piVision
+    const loadedPriority = loadedPiVision?.epicPriority ?? []
+    const epicIds = data.epics.map((e) => e.id)
+    // Keep epicPriority a permutation of the loaded epics: drop stale ids
+    // (deleted epics) and append any epic missing from it (older saves
+    // predate this field, or an epic was added before it existed).
+    const epicPriority = [
+      ...loadedPriority.filter((id) => epicIds.includes(id)),
+      ...epicIds.filter((id) => !loadedPriority.includes(id)),
+    ]
     setPiVision({
       ...loadedPiVision,
-      epicPriority: loadedPiVision?.epicPriority ?? [],
+      epicPriority,
       objectives: loadedPiVision?.objectives ?? [],
     })
   }, [])
