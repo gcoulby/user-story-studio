@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowDown, ArrowUp, Plus, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Check, Pencil, Plus, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -57,6 +57,9 @@ export function PiView({
   onReorderEpicPriority,
 }: PiViewProps) {
   const [newObjective, setNewObjective] = useState('')
+  const [editingObjectiveId, setEditingObjectiveId] = useState<string | null>(
+    null,
+  )
 
   const orderedEpics = piVision.epicPriority
     .map((id) => epics.find((e) => e.id === id))
@@ -129,13 +132,48 @@ export function PiView({
                 className="rounded-md border border-border p-3"
               >
                 <div className="flex items-start gap-2">
-                  <Input
-                    value={objective.text}
-                    onChange={(e) =>
-                      onUpdateObjective(objective.id, { text: e.target.value })
+                  {editingObjectiveId === objective.id ? (
+                    <Textarea
+                      value={objective.text}
+                      onChange={(e) =>
+                        onUpdateObjective(objective.id, {
+                          text: e.target.value,
+                        })
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault()
+                          setEditingObjectiveId(null)
+                        }
+                      }}
+                      autoFocus
+                      rows={2}
+                      className="flex-1 resize-y text-sm"
+                    />
+                  ) : (
+                    <p className="flex-1 break-words text-sm leading-relaxed">
+                      {objective.text}
+                    </p>
+                  )}
+                  <button
+                    onClick={() =>
+                      setEditingObjectiveId((cur) =>
+                        cur === objective.id ? null : objective.id,
+                      )
                     }
-                    className="h-8 flex-1 text-sm"
-                  />
+                    className="shrink-0 text-muted-foreground/60 hover:text-foreground"
+                    aria-label={
+                      editingObjectiveId === objective.id
+                        ? 'Done editing objective'
+                        : 'Edit objective'
+                    }
+                  >
+                    {editingObjectiveId === objective.id ? (
+                      <Check size={14} />
+                    ) : (
+                      <Pencil size={13} />
+                    )}
+                  </button>
                   <button
                     onClick={() => onRemoveObjective(objective.id)}
                     className="shrink-0 text-muted-foreground/60 hover:text-foreground"
