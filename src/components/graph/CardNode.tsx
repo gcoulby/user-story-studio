@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react'
 
 import { CARD_H, CARD_W } from '@/config/graph'
+import { DEFAULT_PRIORITY, PRIORITIES } from '@/config/priority'
 import { isStretch } from '@/lib/cards'
 import { cn } from '@/lib/utils'
 
@@ -13,6 +14,7 @@ const HANDLE_CLASS = '!h-1 !w-1 !border-0 !bg-transparent'
 export function CardNode({ data, selected }: NodeProps<CardNodeType>) {
   const { card, actorLabel, epics, dimmed } = data
   const stretch = isStretch(card)
+  const priority = card.priority ?? DEFAULT_PRIORITY
 
   return (
     <div
@@ -24,7 +26,16 @@ export function CardNode({ data, selected }: NodeProps<CardNodeType>) {
       style={{ width: CARD_W, minHeight: CARD_H, opacity: dimmed ? 0.25 : 1 }}
     >
       <div className="flex items-center justify-between gap-1.5 font-mono text-[9.5px] uppercase tracking-wide text-muted-foreground">
-        {actorLabel}
+        <span className="flex items-center gap-1">
+          {priority !== 'medium' && (
+            <span
+              className="h-1.5 w-1.5 shrink-0 rounded-full"
+              style={{ background: PRIORITIES[priority].color }}
+              title={`${PRIORITIES[priority].label} priority`}
+            />
+          )}
+          {actorLabel}
+        </span>
         {stretch && <span>Stretch</span>}
       </div>
       <div className="mt-1 text-[13px] leading-snug text-foreground">
